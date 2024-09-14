@@ -4,6 +4,25 @@
 
 - Jetson ORIN AGX
 - torch
+- pytorch
+
+## Install requirments 
+
+```
+pip install -U pip
+pip install -r requirments.txt
+pip install torch-2.0.0+nv23.05-cp38-cp38-linux_aarch64.whl
+pip install torchvision-0.15.1-cp38-cp38-manylinux2014_aarch64.whl
+```
+
+## Run Script
+
+```
+cd /path/to/project
+chmod +x srcipt/setup-venv.sh
+./srcipt/setup-venv.sh
+```
+
 
 ## Download resent50 and convert the model from pytorch to torch
 
@@ -35,3 +54,11 @@ cmake --build . --config Release
 
 1. load model
 2. load custom dataset
+
+## Run program
+
+```
+source venv/bin/activate
+python src/components/data_ingestion.py
+```
+
