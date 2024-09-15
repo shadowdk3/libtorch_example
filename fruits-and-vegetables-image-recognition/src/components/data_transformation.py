@@ -21,6 +21,11 @@ import torch.optim as optim
 class DataTransformationConfig:
     preprocessor_obj_file_path=os.path.join('artifacts', "model.pkl")
     
+@dataclass
+class KTypeConfig:
+    KTrain = 0
+    KTest = 1
+
 class ImageLoader(Dataset):
     def __init__(self, dataset, transform=None):
         label_mapping = src.utils.LabelMapping()
@@ -62,16 +67,31 @@ class DataTransformation:
         label_mapping = src.utils.LabelMapping()
         self.class_to_label = label_mapping.class_to_label
         
-    def get_data_transformer_object(self):
+    def get_data_transformer_object(self, KType:KTypeConfig = KTypeConfig.KTest):
         try:
             mean = [0.485, 0.456, 0.406]
             std = [0.229, 0.224, 0.225]
 
-            transform = transforms.Compose([
-                transforms.Resize((224, 224)),
-                transforms.ToTensor(),
-                transforms.Normalize(mean=mean, std=std)
-            ])
+            if KType == KTypeConfig.KTrain:
+                auto_augment_transform = transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.IMAGENET)
+                auto_augment_cifar10 = transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.CIFAR10)
+                auto_augment_svhn = transforms.AutoAugment(policy=transforms.AutoAugmentPolicy.SVHN)
+                
+                transform = transforms.Compose([
+                    transforms.Resize((224, 224)),
+                    auto_augment_transform,
+                    auto_augment_cifar10,
+                    auto_augment_svhn,
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=mean, std=std)
+                ])
+            
+            else:
+                transform = transforms.Compose([
+                    transforms.Resize((224, 224)),
+                    transforms.ToTensor(),
+                    transforms.Normalize(mean=mean, std=std)
+                ])
             
             return transform
          
@@ -92,7 +112,7 @@ class DataTransformation:
         
     def initiate_data_transformation(self, train_path, test_path):
         try:
-            train_dataset = ImageLoader(train_path, transform=self.get_data_transformer_object())
+            train_dataset = ImageLoader(train_path, transform=self.get_data_transformer_object(KTypeConfig.KTrain))
             test_dataset = ImageLoader(test_path, transform=self.get_data_transformer_object())
                    
             train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)         

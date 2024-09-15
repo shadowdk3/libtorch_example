@@ -23,7 +23,6 @@ chmod +x srcipt/setup-venv.sh
 ./srcipt/setup-venv.sh
 ```
 
-
 ## Download resent50 and convert the model from pytorch to torch
 
 ```
